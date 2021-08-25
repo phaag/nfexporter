@@ -83,4 +83,4 @@ If adding `-m <metric socket>` nfcapd exports the internal statistics every 5s t
 
 ## Note:
 
-Only the statistics is exposed and not the netflow recods itself.
+Only the statistics values are exposed and not the netflow records itself.
