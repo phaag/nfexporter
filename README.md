@@ -2,7 +2,7 @@
 
 This is a prototype exporter for nfdump. It exposes metrics processed by the Prometheus monitoring system.
 
-It's purpose is to to play and experiment with nfdump netflow data and Promtheus/Grafana to build a new graphical UI as a repacement for aging NfSen.
+It's purpose is to play and experiment with nfdump netflow data and Promtheus/Grafana to build a new graphical UI as a repacement for aging NfSen.
 
 This experimental exporter exposes counters for flows/packets and bytes per protocol (tcp/udp/icmp/other) and the source identifier from the nfcapd collector. (currently hardwired "live")
 
