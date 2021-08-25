@@ -77,7 +77,7 @@ Build nfdump with `sh bootstrap.sh; ./configure` but do not run make install, as
 
 `./nfcapd -l <tmpflows> -S2 -y -p 9999 -m <metric socket>`  
 
-When adding `-m <metric socket>` nfcapd exports the internal statistics every 5s the the exporter. 
+If adding `-m <metric socket>` nfcapd exports the internal statistics every 5s the the exporter. 
 
 
 
