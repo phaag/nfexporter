@@ -80,6 +80,7 @@ Build nfdump with `sh bootstrap.sh; ./configure` but do not run make install, as
 If adding `-m <metric socket>` nfcapd exports the internal statistics every 5s the the exporter. 
 
 
+Please use https://github.com/phaag/nfdump_exporter/discussions/ for discussions.
 
 ## Note:
 
