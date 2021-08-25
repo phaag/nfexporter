@@ -1,6 +1,6 @@
 # Nfdump Exporter
 
-This is a prototype exporter for nfdump. It exposes metrics processed by the Proetheus monitoring system.
+This is a prototype exporter for nfdump. It exposes metrics processed by the Prometheus monitoring system.
 
 It's purpose is to to play and experiment with nfdump netflow data and Promtheus/Grafana to build a new graphical UI as a repacement for aging NfSen.
 
