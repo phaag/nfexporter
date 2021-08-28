@@ -42,6 +42,7 @@ import (
 	"os/signal"
 	"syscall"
 	"sync"
+	"strconv"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -71,17 +72,17 @@ var (
 	flowsReceived = prometheus.NewDesc(
 		prometheus.BuildFQName(namespace, "collector", "flows"),
 		"How many flows have been received (per ident and protocol (tcp/udp/icmp/other)).",
-		[]string{"ident", "proto"}, nil,
+		[]string{"ident", "exporter", "proto"}, nil,
 	)
 	packetsReceived = prometheus.NewDesc(
 		prometheus.BuildFQName(namespace, "collector", "packets"),
 		"How many packets have been received (per ident and protocol) (tcp/udp/icmp/other).",
-		[]string{"ident", "proto"}, nil,
+		[]string{"ident", "exporter", "proto"}, nil,
 	)
 	bytesReceived = prometheus.NewDesc(
 		prometheus.BuildFQName(namespace, "collector", "bytes"),
 		"How many bytes have been received (per ident and protocol) (tcp/udp/icmp/other).",
-		[]string{"ident", "proto"}, nil,
+		[]string{"ident", "exporter", "proto"}, nil,
 	)
 )
 
@@ -121,24 +122,27 @@ func (e *Exporter) Collect(ch chan<- prometheus.Metric) {
 	*/
 
 	mutex.Lock()
-	ch <- prometheus.MustNewConstMetric(uptime, prometheus.CounterValue, float64(metric.uptime), "v1.7-beta")
-	ch <- prometheus.MustNewConstMetric(flowsReceived, prometheus.CounterValue, float64(metric.numFlows_tcp), metric.ident, "tcp")
-	ch <- prometheus.MustNewConstMetric(flowsReceived, prometheus.CounterValue, float64(metric.numFlows_udp), metric.ident, "udp")
-	ch <- prometheus.MustNewConstMetric(flowsReceived, prometheus.CounterValue, float64(metric.numFlows_icmp), metric.ident, "icmp")
-	ch <- prometheus.MustNewConstMetric(flowsReceived, prometheus.CounterValue, float64(metric.numFlows_other), metric.ident, "other")
+	for ident, metrics := range metricList {
+		for _, metric := range metrics {
+			exporterStr := strconv.FormatUint(metric.exporterID, 10)
+			ch <- prometheus.MustNewConstMetric(flowsReceived, prometheus.CounterValue, float64(metric.numFlows_tcp), ident, exporterStr, "tcp")
+			ch <- prometheus.MustNewConstMetric(flowsReceived, prometheus.CounterValue, float64(metric.numFlows_udp), ident, exporterStr, "udp")
+			ch <- prometheus.MustNewConstMetric(flowsReceived, prometheus.CounterValue, float64(metric.numFlows_icmp), ident, exporterStr, "icmp")
+			ch <- prometheus.MustNewConstMetric(flowsReceived, prometheus.CounterValue, float64(metric.numFlows_other), ident, exporterStr, "other")
 
-	// packets
-	ch <- prometheus.MustNewConstMetric(packetsReceived, prometheus.CounterValue, float64(metric.numPackets_tcp), metric.ident, "tcp")
-	ch <- prometheus.MustNewConstMetric(packetsReceived, prometheus.CounterValue, float64(metric.numPackets_udp), metric.ident, "udp")
-	ch <- prometheus.MustNewConstMetric(packetsReceived, prometheus.CounterValue, float64(metric.numPackets_icmp), metric.ident, "icmp")
-	ch <- prometheus.MustNewConstMetric(packetsReceived, prometheus.CounterValue, float64(metric.numPackets_other), metric.ident, "other")
+			// packets
+			ch <- prometheus.MustNewConstMetric(packetsReceived, prometheus.CounterValue, float64(metric.numPackets_tcp), ident, exporterStr, "tcp")
+			ch <- prometheus.MustNewConstMetric(packetsReceived, prometheus.CounterValue, float64(metric.numPackets_udp), ident, exporterStr, "udp")
+			ch <- prometheus.MustNewConstMetric(packetsReceived, prometheus.CounterValue, float64(metric.numPackets_icmp), ident, exporterStr, "icmp")
+			ch <- prometheus.MustNewConstMetric(packetsReceived, prometheus.CounterValue, float64(metric.numPackets_other), ident, exporterStr, "other")
 
-	// bytes
-	ch <- prometheus.MustNewConstMetric(bytesReceived, prometheus.CounterValue, float64(metric.numBytes_tcp), metric.ident, "tcp")
-	ch <- prometheus.MustNewConstMetric(bytesReceived, prometheus.CounterValue, float64(metric.numBytes_udp), metric.ident, "udp")
-	ch <- prometheus.MustNewConstMetric(bytesReceived, prometheus.CounterValue, float64(metric.numPackets_icmp), metric.ident, "icmp")
-	ch <- prometheus.MustNewConstMetric(bytesReceived, prometheus.CounterValue, float64(metric.numPackets_other), metric.ident, "other")
-	metric = nfsenMetric{}
+			// bytes
+			ch <- prometheus.MustNewConstMetric(bytesReceived, prometheus.CounterValue, float64(metric.numBytes_tcp), ident, exporterStr, "tcp")
+			ch <- prometheus.MustNewConstMetric(bytesReceived, prometheus.CounterValue, float64(metric.numBytes_udp), ident, exporterStr, "udp")
+			ch <- prometheus.MustNewConstMetric(bytesReceived, prometheus.CounterValue, float64(metric.numPackets_icmp), ident, exporterStr, "icmp")
+			ch <- prometheus.MustNewConstMetric(bytesReceived, prometheus.CounterValue, float64(metric.numPackets_other), ident, exporterStr, "other")
+		}
+	}
 	mutex.Unlock()
 
 } // End of Collect
