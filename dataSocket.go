@@ -77,7 +77,7 @@ import (
 
 const packetPrefix byte = '@'
 
-const metricSize int = C.record_size
+var metricSize int = int(C.record_size)
 
 type nfsenMetric struct {
 	//  exporter ID
